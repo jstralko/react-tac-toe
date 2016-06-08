@@ -21,6 +21,7 @@
     "extract-text-webpack-plugin": "^1.0.1",
     "jsdom": "^9.0.0",
     "node-sass": "^3.7.0",
+    "peerjs": "^0.3.14",
     "react": "^15.0.2",
     "react-dom": "^15.0.2",
     "redux": "^3.5.2",

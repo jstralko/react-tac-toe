@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import Board from './components/board/Board.jsx';
 import store from './stores/ticTacToe.js';
 
+
 import './sass/app.scss';
 
 class TicTacToe extends React.Component {
@@ -15,6 +16,23 @@ class TicTacToe extends React.Component {
       player: props.player,
       size: props.size,
     };
+  }
+
+  componentWillMount() {
+    const { p2p } = this.props;
+
+    p2p.peer.on('open', (id) => {
+      console.log(`My peer ID is: ${id}`);
+    });
+
+    p2p.peer.on('connection', (connection) => {
+      const str = JSON.stringify(connection);
+      console.log(`We have established a connection ${str}`);
+    });
+  }
+
+  componentWillUnmount() {
+    this.props.p2p.peer.destroy();
   }
 
   setSize(event) {
@@ -70,6 +88,7 @@ TicTacToe.propTypes = {
   board: React.PropTypes.array.isRequired,
   player: React.PropTypes.string.isRequired,
   size: React.PropTypes.number.isRequired,
+  p2p: React.PropTypes.object.isRequired,
 };
 
 const render = () => {
