@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 
 import Board from './components/board/Board.jsx';
 import store from './stores/ticTacToe.js';
+import Peer from 'peerjs';
 
 
 import './sass/app.scss';
@@ -11,6 +12,7 @@ class TicTacToe extends React.Component {
   constructor(props) {
     super(props);
 
+    this.peer = new Peer({ key: 'ubxnt4vwdx11yvi' });
     this.state = {
       board: props.board,
       player: props.player,
@@ -19,20 +21,24 @@ class TicTacToe extends React.Component {
   }
 
   componentWillMount() {
-    const { p2p } = this.props;
-
-    p2p.peer.on('open', (id) => {
+    this.peer.on('open', (id) => {
       console.log(`My peer ID is: ${id}`);
+      store.dispatch({ type: 'P2P_OPEN', my_id: id });
     });
 
-    p2p.peer.on('connection', (connection) => {
+    this.peer.on('error', (err) => {
+      const errStringify = JSON.stringify(err);
+      console.log(errStringify);
+    });
+
+    this.peer.on('connection', (connection) => {
       const str = JSON.stringify(connection);
       console.log(`We have established a connection ${str}`);
     });
   }
 
   componentWillUnmount() {
-    this.props.p2p.peer.destroy();
+    this.peer.destroy();
   }
 
   setSize(event) {
@@ -88,7 +94,6 @@ TicTacToe.propTypes = {
   board: React.PropTypes.array.isRequired,
   player: React.PropTypes.string.isRequired,
   size: React.PropTypes.number.isRequired,
-  p2p: React.PropTypes.object.isRequired,
 };
 
 const render = () => {

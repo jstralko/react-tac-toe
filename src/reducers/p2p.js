@@ -1,7 +1,4 @@
-import Peer from 'peerjs';
-
 const initP2P = {
-  peer: new Peer({ key: 'ubxnt4vwdx11yvi' }),
   my_id: '',
   peer_id: '',
   initialized: false,
@@ -10,7 +7,11 @@ const initP2P = {
 };
 
 const p2p = (state = initP2P, action) => {
-  console.log(`action ${action}`);
+  if (action.type === 'P2P_OPEN') {
+    return Object.assign({}, state, {
+      my_id: action.my_id,
+    });
+  }
   return state;
 };
 
