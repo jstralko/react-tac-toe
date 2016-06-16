@@ -17,6 +17,7 @@ class TicTacToe extends React.Component {
       board: props.board,
       player: props.player,
       size: props.size,
+      conn: undefined,
     };
   }
 
@@ -24,16 +25,15 @@ class TicTacToe extends React.Component {
     this.peer.on('open', (id) => {
       console.log(`My peer ID is: ${id}`);
       store.dispatch({ type: 'P2P_OPEN', my_id: id });
+
+      this.peer.on('connection', (connection) => {
+        this.setState({ conn: connection }, () => this.establishConnection());
+      });
     });
 
     this.peer.on('error', (err) => {
       const errStringify = JSON.stringify(err);
       console.log(errStringify);
-    });
-
-    this.peer.on('connection', (connection) => {
-      const str = JSON.stringify(connection);
-      console.log(`We have established a connection ${str}`);
     });
   }
 
@@ -45,6 +45,22 @@ class TicTacToe extends React.Component {
     const size = event.target.value;
 
     store.dispatch({ type: 'SET_SIZE', size });
+  }
+
+  establishConnection() {
+    this.peer.on('connection', (connection) => {
+      const str = JSON.stringify(connection);
+      console.log(`We have established a connection ${str}`);
+
+      this.setState({ conn: connection }, () => {
+        this.state.conn.on('open', () => {
+            store.dispatch({
+              type: 'P2P_CONNECTED',
+              connected: true,
+            });
+          });
+      });
+    });
   }
 
   newGame(event) {
